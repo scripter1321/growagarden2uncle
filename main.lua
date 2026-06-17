@@ -161,6 +161,33 @@ guiLib.CreateButton("Harvest All NO TP (close to garden)", "Harvesting", functio
 
 	statusLabel.Text = "Harvest All completed"
 end)
+guiLib.CreateToggle("Loop Harvest All NO TP", "Harvesting", function(GetToggle)
+	while GetToggle() do
+		local prompts = {}
+
+		for _, obj in ipairs(workspace:GetDescendants()) do
+			if obj:IsA("ProximityPrompt") and obj.Name == "HarvestPrompt" then
+				table.insert(prompts, obj)
+			end
+		end
+
+		for _, prompt in ipairs(prompts) do
+			if prompt and prompt.Parent then
+				local oldDistance = prompt.MaxActivationDistance
+
+				prompt.MaxActivationDistance = 9999999999
+				fireproximityprompt(prompt)
+				prompt.MaxActivationDistance = oldDistance
+
+				task.wait(0.1)
+			end
+		end
+
+		statusLabel.Text = "Harvest All completed"
+
+		task.wait(5)
+	end
+end)
 guiLib.CreateButton("Refresh", "Harvesting", scanPrompts)
 
 
