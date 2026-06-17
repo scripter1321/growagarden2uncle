@@ -8,6 +8,20 @@ guiLib.CreateTitle("OPSCRIPTS - Grow A Garden 2")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local listFrame
+local folder = workspace.Map.SeedPackSpawnServerLocations
+local function ClaimGoldSeeds()
+	for _, obj in ipairs(folder:GetChildren()) do
+	    local prompt = obj:FindFirstChildOfClass("ProximityPrompt")
+	
+	    if prompt then
+	        hrp.CFrame = obj.CFrame + Vector3.new(0, 3, 0)
+	        task.wait(0.5)
+	        fireproximityprompt(prompt)
+	        
+	        task.wait(0.2)
+	    end
+	end
+end
 
 local function clearList()
 	if not listFrame then
@@ -223,3 +237,4 @@ guiLib.CreateToggle("Loop Sell All", "Other", function(GetToggle)
 		task.wait(1)
 	end
 end)
+guiLib.CreateButton("Claim All Gold Seeds", "Other", ClaimGoldSeeds)
