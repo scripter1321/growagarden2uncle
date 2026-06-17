@@ -8,21 +8,41 @@ guiLib.CreateTitle("OPSCRIPTS - Grow A Garden 2")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local listFrame
-local folder = workspace.Map.SeedPackSpawnServerLocations
-local function ClaimGoldSeeds()
-	for _, obj in ipairs(folder:GetChildren()) do
-	    local prompt = obj:FindFirstChildOfClass("ProximityPrompt")
-	
-	    if prompt then
-	        hrp.CFrame = obj.CFrame + Vector3.new(0, 3, 0)
-	        task.wait(0.5)
-	        fireproximityprompt(prompt)
-	        
-	        task.wait(0.2)
-	    end
+local function antisteal()
+	local Players = game:GetService("Players")
+	local player = Players.LocalPlayer
+	local gardens = workspace:WaitForChild("Gardens")
+
+	if workspace:GetAttribute("ActivePhase") ~= "Night" then
+		return
+	end
+
+	local myGarden
+	for _, v in ipairs(gardens:GetChildren()) do
+		if v:IsA("Model") and v:GetAttribute("Owner") == player.Name then
+			myGarden = v
+			break
+		end
+	end
+
+	if not myGarden then return end
+
+	local zone = myGarden:WaitForChild("Visual"):WaitForChild("GardenZonePart")
+
+	local parts = workspace:GetPartBoundsInBox(zone.CFrame, zone.Size)
+
+	for _, part in ipairs(parts) do
+		local otherPlayer = Players:GetPlayerFromCharacter(part.Parent)
+
+		if otherPlayer and otherPlayer ~= player then
+			local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+			if root then
+				root.CFrame = zone.CFrame + Vector3.new(0, 3, 0)
+			end
+			break
+		end
 	end
 end
-
 local function clearList()
 	if not listFrame then
 		return
@@ -169,7 +189,7 @@ guiLib.CreateButton("Harvest All NO TP (close to garden)", "Harvesting", functio
 			fireproximityprompt(prompt)
 			prompt.MaxActivationDistance = oldDistance
 
-			task.wait(0.1)
+			task.wait(0.06)
 		end
 	end
 
@@ -193,7 +213,7 @@ guiLib.CreateToggle("Loop Harvest All NO TP", "Harvesting", function(GetToggle)
 				fireproximityprompt(prompt)
 				prompt.MaxActivationDistance = oldDistance
 
-				task.wait(0.1)
+				task.wait(0.06)
 			end
 		end
 
@@ -237,4 +257,4 @@ guiLib.CreateToggle("Loop Sell All", "Other", function(GetToggle)
 		task.wait(1)
 	end
 end)
-guiLib.CreateButton("Claim All Gold Seeds", "Other", ClaimGoldSeeds)
+guiLib.CreateToggle("Anti Steal", "Other", function(GetToggle) while GetToggle() do antisteal() task.wait(0.1) end end)
