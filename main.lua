@@ -56,7 +56,7 @@ local function clearList()
 end
 local PacketEvent = game:GetService("ReplicatedStorage").SharedModules.Packet.RemoteEvent
 local function SellAll()
-    PacketEvent:FireServer( buffer.fromstring("\x9C\x00N"))
+    PacketEvent:FireServer( buffer.fromstring("\xAF\x00\x1D"))
 end
 local function createHarvestList(page)
 
